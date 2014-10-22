@@ -16,20 +16,24 @@ class SIPRegisterHandler(SocketServer.DatagramRequestHandler):
     """
 
     def handle(self):
-        # Escribe dirección y puerto del cliente (de tupla client_address)
         self.diccionario = {}
         while 1:
             line = self.rfile.read()
+            print "Peticion del cliente: " + line
             lista = line.split(" ")
             if lista[0] == "REGISTER":
-                self.diccionario[lista[1]] = self.client_address[0]
-                print "El cliente nos manda " + lista[1] + " 200 OK\r\n\r\n"
-                self.wfile.write(lista[1] + "OK\r\n\r\n")
+                self.diccionario[lista[2]] = self.client_address[0]
+                self.wfile.write(lista[3] + " 200 OK" + "\r\n\r\n")
+                if int(lista[5]) == 0:
+                    del self.diccionario[lista[2]]
+                    self.wfile.write(lista[3] + " 200 OK" + "\r\n\r\n")
+                print lista[3] + " 200 OK" + "\r\n\r\n"
+            else:
+                print "Petición inválida"
             if not line:
                 break
 
 if __name__ == "__main__":
-    # Creamos servidor de eco y escuchamos
     serv = SocketServer.UDPServer(("", int(comandos[1])), SIPRegisterHandler)
     print "Lanzando servidor UDP de eco..."
     serv.serve_forever()
