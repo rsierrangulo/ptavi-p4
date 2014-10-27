@@ -1,35 +1,58 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-15 -*-
 """
-Clase (y programa principal) para un servidor de eco
+Clase (y programa principal) para un servidor SIP
 en UDP simple
 """
 
 import SocketServer
 import sys
+import time
 
-class EchoHandler(SocketServer.DatagramRequestHandler):
-    """
-    Echo server class
-    """
+
+class SIPRegisterHandler(SocketServer.DatagramRequestHandler):
+    """Register SIP"""
+
+    clientes = {}
+
+    def register2file(self):
+        """Escribe en el fichero el diccionario"""
+        fichero = "registered.txt"
+        fichero = open(fichero, "w")
+        cadena = "User\tIP\tExpires\r\n"
+
+        for cliente in self.clientes.keys():
+            hora = time.strftime('%Y-%m-%d %H:%M:%S',
+                                 time.gmtime(self.clientes[cliente][1]))
+            cadena += (cliente + "\t" + self.clientes[cliente][0] +
+                       "\t" + hora + "\r\n")
+        fichero.write(cadena)
 
     def handle(self):
-        # Escribe dirección y puerto del cliente (de tupla client_address)
-        print self.client_address        
-        #IPcliente =  self.client_address(1)
-        #PuertoCliente = self.client_adress(2)
-        #print "IP cliente " & IPcliente & "Puerto cliente " & PuertoCliente         
+        """ Registra y borra clientes del server"""
         self.wfile.write("Hemos recibido tu peticion")
         while 1:
-            # Leyendo línea a línea lo que nos envía el cliente
             line = self.rfile.read()
-            print "El cliente nos manda " + line
             if not line:
                 break
+            palabras = line.split()
+            direccionsip = palabras[1]
+            direccion = direccionsip.split(":")
+            expires = palabras[4]
+            horalim = time.time() + float(expires)
+            self.clientes[direccion[1]] = (self.client_address[0], horalim)
+            vsip = palabras[2]
+            print vsip + " 200 OK \r\n\r\n"
+            if expires == "0":
+                del self.clientes[(direccion[1])]
+            for cliente in self.clientes.keys():
+                if self.clientes[cliente][1] < time.time():
+                    del self.clientes[cliente]
+            self.register2file()
 
 if __name__ == "__main__":
-    # Creamos servidor de eco y escuchamos
-    Puerto = int(sys.argv[1])
-    serv = SocketServer.UDPServer(("", Puerto), EchoHandler)
-    print "Lanzando servidor UDP de eco..."
+    """ Creamos servidor SIP y escuchamos"""
+    puerto = int(sys.argv[1])
+    serv = SocketServer.UDPServer(("", puerto), SIPRegisterHandler)
+    print "Lanzando servidor register..."
     serv.serve_forever()
