@@ -21,11 +21,11 @@ class SIPRegisterHandler(SocketServer.DatagramRequestHandler):
     lista_usuario = []
 
     def register2file(self):
-        self.fichero = open('registered.txt', 'w')
-        self.fichero.write("User" + '\t\t\t\t' + "IP" + '\t\t\t' + "Expires" + '\r\n')
+        fichero = open('registered.txt', 'w')
+        fichero.write("User" + '\t\t\t\t' + "IP" + '\t\t\t' + "Expires" + '\r\n')
         for usuario in self.diccionario.keys():
-            self.fichero.write(usuario + '\t' + self.diccionario[usuario][0] + '\t' + time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(self.diccionario[usuario][1])) + '\r\n')
-        self.fichero.close()
+            fichero.write(usuario + '\t' + self.diccionario[usuario][0] + '\t' + time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(self.diccionario[usuario][1])) + '\r\n')
+        fichero.close()
 
     def handle(self):
         while 1:
@@ -40,19 +40,19 @@ class SIPRegisterHandler(SocketServer.DatagramRequestHandler):
                 for usuario in self.diccionario.keys():
                     if self.diccionario[usuario][1] < tiempo_actual:
                         del self.diccionario[usuario]
-                self.wfile.write(lista[3] + " 200 OK" + "\r\n\r\n")
-                if int(lista[5]) == 0:
-                    del self.diccionario[lista[2]]
                     self.wfile.write(lista[3] + " 200 OK" + "\r\n\r\n")
                 print lista[3] + " 200 OK" + "\r\n\r\n"
             else:
-                print "Petición inválida"
+                print "La petición introducida no es válida" + '\r\n'
             self.register2file()
             if not line:
                 break
 
 
 if __name__ == "__main__":
+    """
+    Procedimiento principal
+    """
     serv = SocketServer.UDPServer(("", int(comandos[1])), SIPRegisterHandler)
     print "Lanzando servidor UDP de eco..."
     serv.serve_forever()
