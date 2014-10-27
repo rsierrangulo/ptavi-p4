@@ -25,9 +25,11 @@ my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 my_socket.connect((SERVER, PORT))
 
-print "Enviando: " + PETICION + " sip: " + DIRECCION + '\r\n' + "Expires: " + TIEMPO
+print "Enviando: " + PETICION + " sip: ",
+print DIRECCION + '\r\n' + "Expires: " + TIEMPO
 
-my_socket.send(PETICION + " sip: " + DIRECCION + " SIP/2.0 " + '\r\n' + "Expires: " + TIEMPO + '\r\n\r\n')
+tiempo = "Expires: " + TIEMPO + '\r\n\r\n'
+my_socket.send(PETICION + " sip:" + DIRECCION + " SIP/2.0" + '\r\n' + tiempo)
 data = my_socket.recv(1024)
 
 print 'Recibido -- ', data
