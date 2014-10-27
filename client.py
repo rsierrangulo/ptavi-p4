@@ -28,7 +28,7 @@ my_socket.connect((SERVER, PORT))
 
 print "Enviando: " + PETICION + " sip: " + DIRECCION + '\r\n' + "Expires: " + TIEMPO
 
-my_socket.send(PETICION + " sip: " + DIRECCION  + " SIP/1.0 " + '\r\n' + "Expires: " + TIEMPO + '\r\n\r\n')
+my_socket.send(PETICION + " sip: " + DIRECCION  + " SIP/2.0 " + '\r\n' + "Expires: " + TIEMPO + '\r\n\r\n')
 data = my_socket.recv(1024)
 
 print 'Recibido -- ', data
