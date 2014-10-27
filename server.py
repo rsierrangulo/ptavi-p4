@@ -11,22 +11,21 @@ import time
 
 comandos = sys.argv
 
+
 class SIPRegisterHandler(SocketServer.DatagramRequestHandler):
     """
     Echo server class
     """
-    
+
     diccionario = {}
     lista_usuario = []
- 
 
     def register2file(self):
         self.fichero = open('registered.txt', 'w')
         self.fichero.write("User" + '\t\t\t\t' + "IP" + '\t\t\t' + "Expires" + '\r\n')
-        for usuario in self.diccionario:
-            self.fichero.write(usuario + '\t' + self.diccionario[usuario][0] + '\t' + self.diccionario[usuario][1] + '\r\n') 
+        for usuario in self.diccionario.keys():
+            self.fichero.write(usuario + '\t' + self.diccionario[usuario][0] + '\t' + time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(self.diccionario[usuario][1])) + '\r\n')
         self.fichero.close()
-        
 
     def handle(self):
         while 1:
@@ -34,22 +33,17 @@ class SIPRegisterHandler(SocketServer.DatagramRequestHandler):
             print "Peticion del cliente: " + line
             lista = line.split(" ")
             if lista[0] == "REGISTER":
-                #tiempo = time.time() + float(lista[5])
-                #tiempo_actual = time.time()
-                hora = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(float(time.time()) + float(lista[5])))
-                hora_actual = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(float(time.time())))
-            #    if tiempo actual < tiempo:
-                    
-                self.lista_usuario = [self.client_address[0], hora]
+                tiempo = time.time() + float(lista[5])
+                tiempo_actual = time.time()
+                self.lista_usuario = [self.client_address[0], tiempo]
                 self.diccionario[lista[2]] = self.lista_usuario
+                for usuario in self.diccionario.keys():
+                    if self.diccionario[usuario][1] < tiempo_actual:
+                        del self.diccionario[usuario]
                 self.wfile.write(lista[3] + " 200 OK" + "\r\n\r\n")
-                print "Diccionario al añadir usuarios:"
-                print self.diccionario
                 if int(lista[5]) == 0:
                     del self.diccionario[lista[2]]
                     self.wfile.write(lista[3] + " 200 OK" + "\r\n\r\n")
-                    print "Diccionario al borrar usuarios:"
-                    print self.diccionario
                 print lista[3] + " 200 OK" + "\r\n\r\n"
             else:
                 print "Petición inválida"
