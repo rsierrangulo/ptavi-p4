@@ -13,6 +13,7 @@ comandos = sys.argv
 if len(comandos) != 6:
     sys.exit('Usage: client.py ip puerto register sip_address expires_value')
 
+
 SERVER = comandos[1]
 PORT = int(comandos[2])
 PETICION = comandos[3]
