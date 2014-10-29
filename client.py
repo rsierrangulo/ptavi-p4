@@ -16,7 +16,7 @@ if len(comandos) != 6:
 
 SERVER = comandos[1]
 PORT = int(comandos[2])
-PETICION = comandos[3]
+PETICION = comandos[3].upper()
 DIRECCION = comandos[4]
 TIEMPO = comandos[5]
 
@@ -25,7 +25,7 @@ my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 my_socket.connect((SERVER, PORT))
 
-print "Enviando: " + PETICION + " sip: ",
+print "Enviando: " + PETICION + " sip:",
 print DIRECCION + '\r\n' + "Expires: " + TIEMPO
 
 tiempo = "Expires: " + TIEMPO + '\r\n\r\n'
