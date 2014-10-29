@@ -40,6 +40,8 @@ class SIPRegisterHandler(SocketServer.DatagramRequestHandler):
         """
         while 1:
             line = self.rfile.read()
+            if not line:
+                break
             print "Peticion del cliente: " + line
             lista = line.split(" ")
             print lista
@@ -51,15 +53,11 @@ class SIPRegisterHandler(SocketServer.DatagramRequestHandler):
                 for usuario in self.diccionario.keys():
                     if self.diccionario[usuario][1] < tiempo_actual:
                         del self.diccionario[usuario]
-                    self.wfile.write("SIP/2.0 200 OK\r\n\r\n")
-                print "SIP/2.0 200 OK\r\n\r\n"
+                self.wfile.write("SIP/2.0 200 OK\r\n\r\n")
             else:
-                print "SIP/2.0 400 Bad Request\r\n\r\n"
                 self.wfile.write("SIP/2.0 400 Bad Request\r\n\r\n")
             self.register2file()
-            if not line:
-                break
-
+           
 
 if __name__ == "__main__":
     """
