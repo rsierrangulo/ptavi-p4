@@ -46,6 +46,7 @@ class SIPRegisterHandler(SocketServer.DatagramRequestHandler):
             self.clientes[direccion[1]] = (self.client_address[0], horalim)
             vsip = palabras[2]
             print vsip + " 200 OK \r\n\r\n"
+            self.wfile.write("SIP/2.0 200 OK\r\n\r\n")
             # Borramos si expires = 0 o el registro ha caducado
             if expires == "0":
                 del self.clientes[(direccion[1])]
